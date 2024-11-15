@@ -23,7 +23,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000', // Allow requests from your React frontend
+    origin: 'http://92.205.167.231', // Allow requests from your React frontend
     credentials: true // Allow credentials (such as cookies or authorization headers)
 }));
 // app.use(bodyParser.urlencoded({ extended: false }));

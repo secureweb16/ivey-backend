@@ -51,8 +51,8 @@ router.put('/update-project/:id', upload.fields([
 ]), projectController.updateProject);
 
 router.post('/send-email', async (req, res) => {
-    const { to, name, email, phone, message } = req.body;
-  
+    const { to, name, email, phone, message, company, website } = req.body;
+    
     // Email options
     const mailOptions = {
       from: "secureweb16@gmail.com",
@@ -64,6 +64,8 @@ router.post('/send-email', async (req, res) => {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Message:</strong> ${message}</p>
+        <p><strong>company:</strong> ${company}</p>
+        <p><strong>website:</strong> ${website}</p>
         `
     };
   

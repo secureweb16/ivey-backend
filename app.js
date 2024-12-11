@@ -22,10 +22,18 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
+// app.use(cors({
+//     origin: 'http://92.205.167.231', // Allow requests from your React frontend
+//     credentials: true // Allow credentials (such as cookies or authorization headers)
+// }));
+
+const allowedOrigins = ['http://92.205.167.231', 'http://localhost:3000'];
+
 app.use(cors({
-    origin: 'http://92.205.167.231', // Allow requests from your React frontend
-    credentials: true // Allow credentials (such as cookies or authorization headers)
+    origin: (origin, callback) => callback(null, allowedOrigins.includes(origin) || !origin),
+    credentials: true
 }));
+
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '10mb' })); // Adjust limit as needed
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // Adjust limit as needed

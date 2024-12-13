@@ -28,6 +28,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const uploadAttachmentFiles = multer();
+
 router.post('/add-project', upload.fields([
     { name: 'galleryImages', maxCount: 100 },
     { name: 'featuredImage', maxCount: 1 },
@@ -51,7 +53,7 @@ router.put('/update-project/:id', upload.fields([
 ]), projectController.updateProject);
 
 router.post('/send-email', async (req, res) => {
-    const { to, name, email, phone, message, company, website } = req.body;
+    const { to, name, email, phone, message } = req.body;
     
     // Email options
     const mailOptions = {
@@ -64,8 +66,6 @@ router.post('/send-email', async (req, res) => {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Message:</strong> ${message}</p>
-        <p><strong>company:</strong> ${company}</p>
-        <p><strong>website:</strong> ${website}</p>
         `
     };
   
@@ -76,6 +76,65 @@ router.post('/send-email', async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: 'Error sending email', error: error.message });
     }
+});
+
+
+router.post('/send-email-vendors', uploadAttachmentFiles.fields([
+  { name: 'generalLiability', maxCount: 1 },
+  { name: 'workerCompensation', maxCount: 1 },
+  { name: 'license', maxCount: 1 },
+  { name: 'lbt', maxCount: 1 },
+  { name: 'permitForms', maxCount: 1 },
+  { name: 'costAffidavit', maxCount: 1 }
+]), async (req, res) => {
+  const { name, email, phone, company, website } = req.body;
+  // const generalLiability = req.files['generalLiability'];
+  // const workerCompensation = req.files['workerCompensation'];
+  // const license = req.files['license'];
+  // const lbt = req.files['lbt'];
+  // const permitForms = req.files['permitForms'];
+  // const costAffidavit = req.files['costAffidavit'];
+
+  const files = [
+    { field: 'generalLiability', label: 'General Liability' },
+    { field: 'workerCompensation', label: 'Worker Compensation' },
+    { field: 'license', label: 'License' },
+    { field: 'lbt', label: 'LBT' },
+    { field: 'permitForms', label: 'Permit Forms' },
+    { field: 'costAffidavit', label: 'Cost Affidavit' },
+  ];
+
+  const attachments = files
+    .filter((file) => req.files[file.field]?.[0]) // Ensure the file exists
+    .map((file) => ({
+      filename: req.files[file.field][0].originalname,
+      content: req.files[file.field][0].buffer,
+  }));
+  
+  // Email options
+  const mailOptions = {
+    from: "secureweb16@gmail.com",
+    // to: "sophia@themilkbar.co",
+    to: "anmol.secureweb@gmail.com",
+    subject: "New Contact form submission",
+    html: `
+      <h2>Contact Form Submission</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>company:</strong> ${company}</p>
+      <p><strong>website:</strong> ${website}</p>
+    `,
+    attachments
+  };
+
+  // // Send the email
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully!', info: info.response });
+  } catch (error) {
+    res.status(500).json({ message: 'Error sending email', error: error.message });
+  }
 });
 
 module.exports = router;
